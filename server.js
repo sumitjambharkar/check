@@ -7,10 +7,9 @@ const serviceAddRouters = require('./routes/serviceAddRoute');
 const bodyParser = require('body-parser');
 const http = require('http');
 const server = http.createServer(app);
-const mongoose = require('mongoose');
+const Port = process.env.PORT || 4000
 const dotenv = require('dotenv');
 const { Server } = require("socket.io");
-const Database = require('./config/Database');
 const fileUpload = require('express-fileupload')
 app.use(bodyParser.urlencoded({ extended: false }));
 dotenv.config()
@@ -28,6 +27,6 @@ app.use('/',userRoutes,serviceAddRouters,publicRoutes)
 
 
 
-server.listen(4000,()=>{
-    console.log(`http://localhost:${4000}`);
+server.listen(Port,()=>{
+    console.log(`http://localhost:${Port}`);
 })
