@@ -1,9 +1,6 @@
 const Service = require("../models/Service");
 const cloudinary = require('cloudinary').v2;
 
-const path = require('path');
-const pdf = require('pdf-poppler');
-
 // Configuration 
 cloudinary.config({
   cloud_name: "clennation",

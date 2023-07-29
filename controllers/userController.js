@@ -39,7 +39,6 @@ const sendEmailResetMailer = async (email, token, id) => {
 const home = (req, res) => {
   try {
     res.send("sumit");
-    console.log(req.session);
   } catch (error) {
     console.log(error);
   }
@@ -160,7 +159,6 @@ const login = async (req, res) => {
       const isMatch = await bcrypt.compare(password, userData.password);
       if (userData.email === email && isMatch) {
         req.session._id = userData._id;
-        console.log(req.session._id);
         req.session.email = userData.email;
         const token = await jwt.sign({ userData }, config.secret_jwt, {
           expiresIn: "2h",
