@@ -1,22 +1,75 @@
 const Service = require("../models/Service");
+const cloudinary = require('cloudinary').v2;
+
+const path = require('path');
+const pdf = require('pdf-poppler');
+
+// Configuration 
+cloudinary.config({
+  cloud_name: "clennation",
+  api_key: "171362321243793",
+  api_secret: "0qTa9v3UcUJdNboehCWCDuv951Y"
+});
+
+const homePage = async (req, res) => {
+  try {
+    const uniqueCategories = await Service.aggregate([
+      {
+        $group: { _id: "$category", name: { $first: "$name" }, image: { $first: "$image", } }
+      }
+    ]);
+    res.status(200).json(uniqueCategories);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const categoryPage = async (req, res) => {
+  const { category } = req.params;
+  try {
+    const uniqueCategories = await Service.aggregate([
+      {
+        $match: { category: category }
+      }
+    ]);
+    res.status(200).json(uniqueCategories);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
 
 const addService = async (req, res) => {
   try {
-    const { categorie,service,service_name,service_price,service_description,service_image} = req.body;
+    const { category,name,price,description,userId,mobile} = req.body;
+    const file = req.files.image
+    
+    const result = await cloudinary.uploader.upload(file.tempFilePath)
     const newService = new Service({
-      categorie,
-      service,
-      service_name,
-      service_price,
-      service_description,
-      service_image
+      mobile,
+      category,
+      name,
+      price,
+      description,
+      image:result.secure_url,
+      userId:userId
     });
     await newService.save();
-    res.status(200).json({ data: service });
+    res.status(200).json({ data:newService});
   } catch (error) {
     console.log(error);
   }
 };
+
+const adminservice = async (req,res)=> {
+  try {
+    const serviceData =await Service.find({userId:req.body.userId}).populate('userId')
+    res.json({msge:"Success",serviceData})
+  } catch (error) {
+    res.json({msge:"error"})
+  }
+}
 
 const updateService = async (req, res) => {
   try {
@@ -64,26 +117,30 @@ const deleteService = async (req, res) => {
   }
 };
 
-const searchService = async (req,res) => {
+const searchService = async (req, res) => {
   try {
     const result = await Service.find({
-        "$or":[
-            {name:{$regex:req.params.key}},
-            {des:{$regex:req.params.key}},
-            {cost:{$regex:req.params.key}}
-        ]
+      "$or": [
+        { name: { $regex: req.params.key, $options: "i" } },
+        { des: { $regex: req.params.key, $options: "i" } },
+        { cost: { $regex: req.params.key, $options: "i" } }
+      ]
     });
-    res.status(200).json({ data:result });
+    res.status(200).json({ data: result });
   } catch (error) {
-
+    console.log(error);
   }
 };
 
+
 module.exports = {
+  homePage,
+  categoryPage,
   addService,
   updateService,
   showData,
   singalService,
   deleteService,
   searchService,
+  adminservice
 };
