@@ -10,6 +10,7 @@ const server = http.createServer(app);
 const Port = process.env.PORT || 4000
 const dotenv = require('dotenv');
 const { Server } = require("socket.io");
+const Database = require('./config/Database');
 const fileUpload = require('express-fileupload')
 app.use(bodyParser.urlencoded({ extended: false }));
 dotenv.config()
