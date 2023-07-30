@@ -158,8 +158,6 @@ const login = async (req, res) => {
     if (userData) {
       const isMatch = await bcrypt.compare(password, userData.password);
       if (userData.email === email && isMatch) {
-        req.session._id = userData._id;
-        req.session.email = userData.email;
         const token = await jwt.sign({ userData }, config.secret_jwt, {
           expiresIn: "2h",
         });
